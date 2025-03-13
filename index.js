@@ -6,8 +6,11 @@ dotenv.config();
 
 // Importar las rutas
 
-import productosRouter from './routes/productos/productosRoutes.js';
-import usuariosRoutes from './routes/usuarios/usuariosRoutes.js';
+import productosrouter from './router/productos/productosRouter.js';
+import usuariosrouter from './router/usuarios/usuariosRouter.js';
+import clientesrouter from './router/clientes/clientesRouter.js';
+import marcasrouter from './router/marcas/marcasRouter.js';
+import proveedoresrouter from './router/proveedores/proveedoresRouter.js';
 
 // Crear la app de express
 const app = express();
@@ -34,8 +37,11 @@ const port = 3000;
 
 // Usar las rutas
 
-app.use('/productos', productosRouter);
-app.use('/usuarios', usuariosRoutes);
+app.use('/productos', productosrouter);
+app.use('/usuarios', usuariosrouter);
+app.use('/clientes', clientesrouter);
+app.use('/marcas', marcasrouter);
+app.use('/proveedores', proveedoresrouter);
 
 
 
