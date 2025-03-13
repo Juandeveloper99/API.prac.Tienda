@@ -11,14 +11,14 @@ const respuesta = (err, result, resolve, reject) => {
     }
 };
 /**
- * Carga la lista de productos
+ * Carga la lista de usuarios
  */
-const listarTodosproductosQuery = () => {
+const listarTodosusuariosQuery = () => {
     // Una promesa es una forma de que siempre se devuelva un resultado al quien llama (sea error o éxito)
     // Si la consulta no genera error, entonces resuelve/cumple la promesa con el resultado
     // Si hay algun error entonces rechaza la consulta e informa la razón 
     return new Promise((resolve, reject) => {
-        config.query('SELECT * FROM productos', (err, filas) => {
+        config.query('SELECT * FROM usuarios', (err, filas) => {
             respuesta(err, filas, resolve, reject);
         });
     });
@@ -27,9 +27,9 @@ const listarTodosproductosQuery = () => {
 /**
  * Buscar un libro por su ID (llave primaria)
  */
-const listarproductosPorIdQuery = (id) => {
+const listarusuariosPorIdQuery = (id) => {
     return new Promise((resolve, reject) => {
-        config.query('SELECT * FROM productos WHERE id_producto = ? LIMIT 1', [id], (err, filas) => {
+        config.query('SELECT * FROM usuarios WHERE id_usuario = ? LIMIT 1', [id], (err, filas) => {
             respuesta(err, filas, resolve, reject);
         });
     });
@@ -39,10 +39,10 @@ const listarproductosPorIdQuery = (id) => {
 /**
  * Guardar un nuevo libro
  */
-const crearproductosQuery = async (producto) => {
+const crearusuariosQuery = async (producto) => {
     const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id } = producto;
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO productos (id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const sql = 'INSERT INTO usuarios (id_usuario, nombre, email, contraseña, rol) VALUES (?, ?, ?, ?, ?)';
         config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
@@ -52,10 +52,10 @@ const crearproductosQuery = async (producto) => {
 /**
  * Actualizar un libro por su ID
  */
-const actualizarproductosQuery = (id, producto) => {
+const actualizarusuariosQuery = (id, producto) => {
     const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id } = producto;
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE productos SET id_producto = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria_id = ?, marca_id = ? WHERE id_producto = ?';
+        const sql = 'UPDATE usuarios SET id_usuario = ?, nombre = ?, email = ?, contraseña = ?, rol = ? WHERE id_usuario = ?';
         config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
@@ -65,9 +65,9 @@ const actualizarproductosQuery = (id, producto) => {
 /**
  * Eliminar un libro por su ID
  */
-const eliminarproductosQuery = (id) => {
+const eliminarusuariosQuery = (id) => {
     return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM productos WHERE id_producto = ?';
+        const sql = 'DELETE FROM usuarios WHERE id_usuario = ?';
         config.query(sql, [id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
@@ -76,9 +76,9 @@ const eliminarproductosQuery = (id) => {
 
 // Exportar todas las funciones definidas en este archivo
 export {
-    listarTodosproductosQuery,
-    listarproductosPorIdQuery,
-    crearproductosQuery,
-    actualizarproductosQuery,
-    eliminarproductosQuery   
+    listarTodosusuariosQuery,
+    listarusuariosPorIdQuery,
+    crearusuariosQuery,
+    actualizarusuariosQuery,
+    eliminarusuariosQuery   
 }

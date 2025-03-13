@@ -6,11 +6,8 @@ dotenv.config();
 
 // Importar las rutas
 
-
-
 import productosRouter from './routes/productos/productosRoutes.js';
-
-
+import usuariosRoutes from './routes/usuarios/usuariosRoutes.js';
 
 // Crear la app de express
 const app = express();
@@ -38,6 +35,8 @@ const port = 3000;
 // Usar las rutas
 
 app.use('/productos', productosRouter);
+app.use('/usuarios', usuariosRoutes);
+
 
 
 // Levantar el servidor en el puerto 3000
