@@ -40,10 +40,10 @@ const listarproductosPorIdQuery = (id) => {
  * Guardar un nuevo libro
  */
 const crearproductosQuery = async (producto) => {
-    const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id } = producto;
+    const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras} = producto;
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO productos (id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id], (err, resultado) => {
+        const sql = 'INSERT INTO productos (id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
@@ -53,10 +53,10 @@ const crearproductosQuery = async (producto) => {
  * Actualizar un libro por su ID
  */
 const actualizarproductosQuery = (id, producto) => {
-    const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id } = producto;
+    const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras} = producto;
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE productos SET id_producto = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria_id = ?, marca_id = ? WHERE id_producto = ?';
-        config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id], (err, resultado) => {
+        const sql = 'UPDATE productos SET id_producto = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria_id = ?, marca_id = ?, cod_barras = ? WHERE id_producto = ?';
+        config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });

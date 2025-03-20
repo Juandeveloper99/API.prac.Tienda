@@ -11,6 +11,9 @@ import usuariosrouter from './router/usuarios/usuariosRouter.js';
 import clientesrouter from './router/clientes/clientesRouter.js';
 import marcasrouter from './router/marcas/marcasRouter.js';
 import proveedoresrouter from './router/proveedores/proveedoresRouter.js';
+import categoriasrouter from './router/categorias/categoriaRouter.js';
+import stonkrouter from './router/stonk/stonkRouter.js';
+import comprasrouter from './router/compras/comprasRouter.js';
 
 // Crear la app de express
 const app = express();
@@ -42,6 +45,9 @@ app.use('/usuarios', usuariosrouter);
 app.use('/clientes', clientesrouter);
 app.use('/marcas', marcasrouter);
 app.use('/proveedores', proveedoresrouter);
+app.use('/categorias', categoriasrouter);
+app.use('/movimientos_stock', stonkrouter);
+app.use('/compras', comprasrouter);
 
 
 
