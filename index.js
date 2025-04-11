@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-
 import dotenv from 'dotenv';
+
+
 dotenv.config();
 
 // Importar las rutas
-
 import productosrouter from './router/productos/productosRouter.js';
 import usuariosrouter from './router/usuarios/usuariosRouter.js';
 import clientesrouter from './router/clientes/clientesRouter.js';
@@ -15,30 +15,34 @@ import categoriasrouter from './router/categorias/categoriaRouter.js';
 import stonkrouter from './router/stonk/stonkRouter.js';
 import comprasrouter from './router/compras/comprasRouter.js';
 
-// Crear la app de express
 const app = express();
 
-// Habilitar la captura de datos mediante post / formularios
+// 🔥 Configurar CORS directamente (sin depender de .env)
+const corsOptions = {
+    origin: '*', // Permite todas las solicitudes (temporalmente)
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+
+// 🔥 Añadir manualmente el encabezado CORS en cada respuesta
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Permite todas las solicitudes
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
+// Procesar JSON y formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const corsOptions = {
-    origin: process.env.CORS_ORIGIN,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  
-    exposedHeaders: 'Content-Length,X-Knowledge',
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204 // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
+const port = process.env.PORT || 3000;
 
-// Apply CORS middleware globally
+// Rutas
 
-
-// Configurar el puerto
-const port = 3000;
-
-// Usar las rutas
 
 app.use('/productos', productosrouter);
 app.use('/usuarios', usuariosrouter);
@@ -49,9 +53,7 @@ app.use('/categorias', categoriasrouter);
 app.use('/movimientos_stock', stonkrouter);
 app.use('/compras', comprasrouter);
 
-
-
-// Levantar el servidor en el puerto 3000
+// 🔥 Levantar el servidor
 app.listen(port, () => {
-    console.log(`Servidor corriendo en el puerto ${port}`);
+    console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });
