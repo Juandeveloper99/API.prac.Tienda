@@ -28,6 +28,7 @@ const listarTodosproductosQuery = () => {
  * Buscar un libro por su ID (llave primaria)
  */
 const listarproductosPorIdQuery = (id) => {
+    
     return new Promise((resolve, reject) => {
         config.query('SELECT * FROM productos WHERE id_producto = ? LIMIT 1', [id], (err, filas) => {
             respuesta(err, filas, resolve, reject);
@@ -42,8 +43,8 @@ const listarproductosPorIdQuery = (id) => {
 const crearproductosQuery = async (producto) => {
     const { id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras} = producto;
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO productos (id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        config.query(sql, [id_producto, nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras], (err, resultado) => {
+        const sql = 'INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        config.query(sql, [nombre, descripcion, precio, stock, categoria_id, marca_id, cod_barras], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });

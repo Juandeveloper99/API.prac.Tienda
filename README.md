@@ -1,12 +1,11 @@
-# API de ejemplo Biblioteca
 
-### Rutas CRUD para libros
+### Rutas CRUD para productos
 
-- GET `http://localhost:3000/libros`
-- GET `http://localhost:3000/libros/:id`
-- POST `http://localhost:3000/libros`
-- PUT `http://localhost:3000/libros/:id`
-- DELETE `http://localhost:3000/libros/:id`
+- GET `http://localhost:3000/productos`
+- GET `http://localhost:3000/productos/:id`
+- POST `http://localhost:3000/productosibros`
+- PUT `http://localhost:3000/productos/:id`
+- DELETE `http://localhost:3000/productos/:id`
 
 
 ### Rutas de AUTH
