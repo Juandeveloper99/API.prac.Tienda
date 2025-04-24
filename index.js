@@ -14,6 +14,7 @@ import proveedoresrouter from './router/proveedores/proveedoresRouter.js';
 import categoriasrouter from './router/categorias/categoriaRouter.js';
 import stonkrouter from './router/stonk/stonkRouter.js';
 import comprasrouter from './router/compras/comprasRouter.js';
+import facturacionrouter from './router/facturacion/facturacionRouter.js';
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/proveedores', proveedoresrouter);
 app.use('/categorias', categoriasrouter);
 app.use('/movimientos_stock', stonkrouter);
 app.use('/compras', comprasrouter);
+app.use('/facturacion', facturacionrouter);
 
 // 🔥 Levantar el servidor
 app.listen(port, () => {

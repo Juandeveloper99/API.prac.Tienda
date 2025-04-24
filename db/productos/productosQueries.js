@@ -14,15 +14,22 @@ const respuesta = (err, result, resolve, reject) => {
  * Carga la lista de productos
  */
 const listarTodosproductosQuery = () => {
-    // Una promesa es una forma de que siempre se devuelva un resultado al quien llama (sea error o éxito)
-    // Si la consulta no genera error, entonces resuelve/cumple la promesa con el resultado
-    // Si hay algun error entonces rechaza la consulta e informa la razón 
     return new Promise((resolve, reject) => {
-        config.query('SELECT * FROM productos', (err, filas) => {
+        const sql = `
+            SELECT 
+                productos.*, 
+                categorias.nombre AS nombre_categoria, 
+                marcas.nombre AS nombre_marca 
+            FROM productos
+            INNER JOIN categorias ON productos.categoria_id = categorias.id_categoria
+            INNER JOIN marcas ON productos.marca_id = marcas.id_marca
+        `;
+        config.query(sql, (err, filas) => {
             respuesta(err, filas, resolve, reject);
         });
     });
 };
+
 
 /**
  * Buscar un libro por su ID (llave primaria)
