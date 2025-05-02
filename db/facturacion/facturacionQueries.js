@@ -18,12 +18,13 @@ const listarTodosfacturacionQuery = () => {
         const sql = `
             SELECT 
                 facturacion.factura_id,
-                facturacion.n_fact,
+                facturacion.no.fact,
                 facturacion.fecha_fact,
-                facturacion.vendedor,
-                facturacion.cat_fact,
-                facturacion.producto_fact,
                 facturacion.cliente,
+                facturacion.producto_fact,
+                facturacion.cantidad_prod,
+                facturacion.Usuario_factura,
+                facturacion.precio_producto,
                 productos.nombre,
                 productos.precio,
                 productos.cod_barras
@@ -56,35 +57,16 @@ const listarfacturacionPorIdQuery = (id) => {
 /**
  * Guardar un nuevo libro
  */
-const  crearfacturacionQuery = (datos) => {
+const crearfacturacionQuery = async (factura) => {
+    const { fecha_fact, cliente, productos_fact, usuario_factura, total} = factura;
     return new Promise((resolve, reject) => {
-        const sql = `
-            INSERT INTO facturacion (
-                factura_id,
-                n_fact,
-                fecha_fact,
-                vendedor,
-                cat_fact,
-                producto_fact,
-                cliente
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        const valores = [
-            datos.factura_id,
-            datos.n_fact,
-            datos.fecha_fact,
-            datos.vendedor,
-            datos.cat_fact,
-            datos.producto_fact,
-            datos.cliente
-        ];
-
-        config.query(sql, valores, (err, resultado) => {
+        const sql = 'INSERT INTO facturacion (fecha_fact, cliente, productos_fact, usuario_factura, total) VALUES (?, ?, ?, ?, ?)';
+        config.query(sql, [fecha_fact, cliente, productos_fact, usuario_factura, total], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
+
 
 
 /**
