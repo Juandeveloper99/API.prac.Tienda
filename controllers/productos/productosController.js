@@ -3,7 +3,7 @@ import {
   listarproductosPorIdQuery,
   crearproductosQuery,
   actualizarproductosQuery,
-  eliminarproductosQuery
+  eliminarproductosQuery,
 } from "../../db/productos/productosQueries.js";
 
 /**
@@ -87,10 +87,110 @@ const eliminarproductos = async (req, res) => {
   }
 };
 
+
+// En tu routes/productos.js
+const actualizarStock = async (req, res) => {
+  const { id } = req.params;
+  const { stock } = req.body;
+
+  // 1. Validaciones mejoradas
+  const validationErrors = [];
+  
+  if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+    validationErrors.push('ID de producto debe ser un entero positivo');
+  }
+
+  if (stock === undefined || !Number.isFinite(Number(stock)) || Number(stock) < 0) {
+    validationErrors.push('Stock debe ser un número positivo');
+  }
+
+  if (validationErrors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      errors: validationErrors,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // 2. Manejo de transacciones y lógica mejorada
+  try {
+    // 2.1. Verificar existencia del producto primero
+    const productoExistente = await verificarExistenciaProductoQuery(id);
+    if (!productoExistente) {
+      return res.status(404).json({
+        success: false,
+        error: 'Producto no encontrado',
+        productId: id,
+        suggestion: 'Verifique el ID del producto'
+      });
+    }
+
+    // 2.2. Actualizar stock
+    const resultado = await actualizarStockQuery(id, stock);
+    
+    // 2.3. Validar resultado
+    if (resultado.affectedRows === 0) {
+      console.warn(`Actualización de stock no afectó filas para producto ID: ${id}`);
+      return res.status(409).json({
+        success: false,
+        error: 'No se pudo actualizar el stock',
+        reason: 'Ninguna fila fue afectada'
+      });
+    }
+
+    // 2.4. Registrar la transacción
+    await registrarMovimientoStock({
+      productoId: id,
+      cantidad: stock - productoExistente.stock,
+      tipo: 'AJUSTE',
+      usuario: req.user?.id || 'sistema'
+    });
+
+    // 3. Respuesta exitosa estructurada
+    return res.json({
+      success: true,
+      data: {
+        id_producto: id,
+        stock_anterior: productoExistente.stock,
+        nuevo_stock: stock,
+        diferencia: stock - productoExistente.stock
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        operation: 'updateStock'
+      }
+    });
+
+  } catch (error) {
+    // 4. Manejo de errores mejorado
+    console.error(`Error al actualizar stock para producto ${id}:`, {
+      error: error.message,
+      stack: error.stack,
+      requestBody: req.body,
+      params: req.params
+    });
+
+    const statusCode = error.code === 'ER_DUP_ENTRY' ? 409 : 500;
+    
+    return res.status(statusCode).json({
+      success: false,
+      error: 'Error al actualizar stock',
+      details: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      } : undefined,
+      requestId: req.requestId
+    });
+  }
+};
+
+
 export {
   listarTodosproductos,
   listarproductosPorId,
   crearproductos,
   actualizarproductos,
   eliminarproductos,
+  actualizarStock
 };

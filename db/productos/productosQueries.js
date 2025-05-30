@@ -82,11 +82,26 @@ const eliminarproductosQuery = (id) => {
     });
 };
 
+const actualizarStockQuery = (id, stock) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE productos SET stock = ? WHERE id_producto = ?';
+    config.query(sql, [stock, id], (err, resultado) => {
+      if (err) {
+        console.error('Error en actualizarStockQuery:', err);
+        reject(err);
+      } else {
+        resolve(resultado);
+      }
+    });
+  });
+};
+
 // Exportar todas las funciones definidas en este archivo
 export {
     listarTodosproductosQuery,
     listarproductosPorIdQuery,
     crearproductosQuery,
     actualizarproductosQuery,
-    eliminarproductosQuery   
+    eliminarproductosQuery,
+    actualizarStockQuery
 }
