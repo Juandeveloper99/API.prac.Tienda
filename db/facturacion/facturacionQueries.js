@@ -1,104 +1,199 @@
-import config from '../../config.js';
+import config from '../../config.js'; // Asegúrate de tener esto para las transacciones
 
-
-// Helper function to handle query results
-const respuesta = (err, result, resolve, reject) => {
+// Helper function mejorada
+const handleQuery = (err, result, resolve, reject, context = {}) => {
     if (err) {
-        console.log(err);
+        console.error('Error en facturación:', {
+            error: err,
+            context,
+            stack: err.stack
+        });
         reject(err);
     } else {
         resolve(result);
     }
 };
+
 /**
- * Carga la lista de facturacion
+ * Obtiene todas las facturas
  */
 const listarTodosfacturacionQuery = () => {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT 
-                facturacion.factura_id,
-                facturacion.no.fact,
-                facturacion.fecha_fact,
-                facturacion.cliente,
-                facturacion.producto_fact,
-                facturacion.cantidad_prod,
-                facturacion.Usuario_factura,
-                facturacion.precio_producto,
-                productos.nombre,
-                productos.precio,
-                productos.cod_barras
-            FROM 
-                facturacion
-            INNER JOIN 
-                productos ON facturacion.producto_fact = productos.id_producto;
+                factura_id,
+                fecha_fact,
+                cliente,
+                productos_fact,
+                usuario_fact,
+                total
+            FROM facturacion 
+            ORDER BY fecha_fact DESC
         `;
-        config.query(sql, (err, filas) => {
-            respuesta(err, filas, resolve, reject);
+        
+        config.query(sql, (err, facturas) => {
+            if (err) return handleQuery(err, null, resolve, reject, { sql });
+            
+            // Parsear productos si están en JSON
+            const facturasFormateadas = facturas.map(factura => {
+                try {
+                    return {
+                        ...factura,
+                        productos_fact: factura.productos_fact ? JSON.parse(factura.productos_fact) : []
+                    };
+                } catch (e) {
+                    console.error('Error parseando productos_fact:', e);
+                    return {
+                        ...factura,
+                        productos_fact: []
+                    };
+                }
+            });
+            
+            resolve(facturasFormateadas);
         });
     });
 };
 
-
-
 /**
- * Buscar un libro por su ID (llave primaria)
+ * Obtiene una factura por ID
  */
 const listarfacturacionPorIdQuery = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT 
+                factura_id,
+                fecha_fact,
+                cliente,
+                productos_fact,
+                usuario_fact,
+                total
+            FROM facturacion 
+            WHERE factura_id = ?
+            LIMIT 1
+        `;
+        
+        config.query(sql, [id], (err, [factura]) => {
+            if (err) return handleQuery(err, null, resolve, reject, { sql, params: [id] });
+            
+            if (!factura) return resolve(null);
+            
+            try {
+                resolve({
+                    ...factura,
+                    productos_fact: factura.productos_fact ? JSON.parse(factura.productos_fact) : []
+                });
+            } catch (e) {
+                handleQuery(e, null, resolve, reject, { factura });
+            }
+        });
+    });
+};
+
+/**
+ * Crea una nueva factura con transacción
+ */
+const crearfacturacionQuery = async (facturaData) => {
+    const { cliente, productos, usuario_fact, total } = facturaData;
     
+    // Validación
+    if (!cliente || !usuario_fact || total <= 0 || !productos?.length) {
+        const error = new Error('Datos de factura incompletos: cliente, vendedor, total y productos son requeridos');
+        console.error(error.message, facturaData);
+        throw error;
+    }
+
+    // Formatear productos
+    const productosFactura = productos.map(p => ({
+        id: p.id_producto,
+        nombre: p.nombre,
+        cantidad: p.cantidad,
+        precio: p.precio,
+        codigo: p.cod_barras || ''
+    }));
+
+    const productos_fact = JSON.stringify(productosFactura);
+    const fecha_fact = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    const connection = await getConnection();
+    
+    try {
+        await connection.beginTransaction();
+
+        // 1. Insertar factura
+        const [result] = await connection.query(
+            `INSERT INTO facturacion 
+            (fecha_fact, cliente, productos_fact, usuario_fact, total) 
+            VALUES (?, ?, ?, ?, ?)`,
+            [fecha_fact, cliente, productos_fact, usuario_fact, total]
+        );
+
+        // 2. Actualizar stock para cada producto
+        for (const producto of productos) {
+            await connection.query(
+                `UPDATE productos SET stock = stock - ? WHERE id_producto = ?`,
+                [producto.cantidad, producto.id_producto]
+            );
+        }
+
+        await connection.commit();
+        
+        return {
+            factura_id: result.insertId,
+            fecha_fact,
+            cliente,
+            usuario_fact,
+            total,
+            productos: productosFactura
+        };
+    } catch (err) {
+        await connection.rollback();
+        console.error('Error en transacción de factura:', {
+            error: err,
+            data: facturaData,
+            stack: err.stack
+        });
+        throw err;
+    } finally {
+        connection.release();
+    }
+};
+
+/**
+ * Actualiza una factura (solo datos básicos, no productos)
+ */
+const actualizarfacturacionQuery = (factura_id, { cliente, usuario_fact }) => {
     return new Promise((resolve, reject) => {
-        config.query('SELECT * FROM facturacion WHERE factura_id = ? LIMIT 1', [id], (err, filas) => {
-            respuesta(err, filas, resolve, reject);
+        const sql = `
+            UPDATE facturacion 
+            SET 
+                cliente = ?,
+                usuario_fact = ?
+            WHERE factura_id = ?
+        `;
+        
+        config.query(sql, [cliente, usuario_fact, factura_id], (err, result) => {
+            handleQuery(err, result, resolve, reject, { sql, params: [cliente, usuario_fact, factura_id] });
         });
     });
 };
 
-
 /**
- * Guardar un nuevo libro
+ * Elimina una factura
  */
-const crearfacturacionQuery = async (factura) => {
-    const { fecha_fact, cliente, productos_fact, usuario_factura, total} = factura;
-    return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO facturacion (fecha_fact, cliente, productos_fact, usuario_factura, total) VALUES (?, ?, ?, ?, ?)';
-        config.query(sql, [fecha_fact, cliente, productos_fact, usuario_factura, total], (err, resultado) => {
-            respuesta(err, resultado, resolve, reject);
-        });
-    });
-};
-
-
-
-/**
- * Actualizar un libro por su ID
- */
-const actualizarfacturacionQuery = (factura) => {
-    const { n_fact, fecha_fact, vendedor, cat_fact, producto_fact, cliente} = factura;
-    return new Promise((resolve, reject) => {
-        const sql = 'UPDATE facturacion SET factura_id = ?, n_fact = ?, fecha_fact = ?, vendedor = ?, cat_fact = ?, producto_fact = ?, cliente = ? WHERE factura_id = ?';
-        config.query(sql, [n_fact, fecha_fact, vendedor, cat_fact, producto_fact, cliente], (err, resultado) => {
-            respuesta(err, resultado, resolve, reject);
-        });
-    });
-};
-
-/**
- * Eliminar un libro por su ID
- */
-const eliminarfacturacionQuery = (id) => {
+const eliminarfacturacionQuery = (factura_id) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM facturacion WHERE factura_id = ?';
-        config.query(sql, [id], (err, resultado) => {
-            respuesta(err, resultado, resolve, reject);
+        config.query(sql, [factura_id], (err, result) => {
+            handleQuery(err, result, resolve, reject, { sql, params: [factura_id] });
         });
     });
 };
 
-// Exportar todas las funciones definidas en este archivo
 export {
     listarTodosfacturacionQuery,
     listarfacturacionPorIdQuery,
     crearfacturacionQuery,
     actualizarfacturacionQuery,
-    eliminarfacturacionQuery   
-}
+    eliminarfacturacionQuery
+};

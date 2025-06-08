@@ -1,7 +1,5 @@
 import config from '../../config.js';
 
-
-// Helper function to handle query results
 const respuesta = (err, result, resolve, reject) => {
     if (err) {
         console.log(err);
@@ -10,13 +8,11 @@ const respuesta = (err, result, resolve, reject) => {
         resolve(result);
     }
 };
+
 /**
  * Carga la lista de marcas
  */
 const listarTodosmarcasQuery = () => {
-    // Una promesa es una forma de que siempre se devuelva un resultado al quien llama (sea error o éxito)
-    // Si la consulta no genera error, entonces resuelve/cumple la promesa con el resultado
-    // Si hay algun error entonces rechaza la consulta e informa la razón 
     return new Promise((resolve, reject) => {
         config.query('SELECT * FROM marcas', (err, filas) => {
             respuesta(err, filas, resolve, reject);
@@ -25,7 +21,7 @@ const listarTodosmarcasQuery = () => {
 };
 
 /**
- * Buscar un libro por su ID (llave primaria)
+ * Buscar una marca por su ID
  */
 const listarmarcasPorIdQuery = (id) => {
     return new Promise((resolve, reject) => {
@@ -35,50 +31,48 @@ const listarmarcasPorIdQuery = (id) => {
     });
 };
 
-
 /**
- * Guardar un nuevo libro
+ * Guardar una nueva marca
  */
-const crearmarcasQuery = async (marcas) => {
-    const { id_marcas, nombre, descripcion, precio, stock, categoria_id, marca_id } = marcas;
+const crearmarcasQuery = (marcas) => {
+    const { nombre } = marcas;
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO marcas (id_marcas, nombre) VALUES (?, ?)';
-        config.query(sql, [id_marcas, nombre, descripcion, precio, stock, categoria_id, marca_id], (err, resultado) => {
+        const sql = 'INSERT INTO marcas (nombre) VALUES (?)'; // Solo un placeholder
+        config.query(sql, [nombre], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
 
 /**
- * Actualizar un libro por su ID
+ * Actualizar una marca por su ID
  */
 const actualizarmarcasQuery = (id, marcas) => {
-    const { id_marcas, nombre} = marcas;
+    const { nombre } = marcas;
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE marcas SET id_marcas = ?, nombre = ? WHERE id_marcas = ?';
-        config.query(sql, [id_marcas, nombre], (err, resultado) => {
+        const sql = 'UPDATE marcas SET nombre = ? WHERE id_marca = ?'; // Corregido nombre de columna
+        config.query(sql, [nombre, id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
 
 /**
- * Eliminar un libro por su ID
+ * Eliminar una marca por su ID
  */
 const eliminarmarcasQuery = (id) => {
     return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM marcas WHERE id_marcas = ?';
+        const sql = 'DELETE FROM marcas WHERE id_marca = ?'; // Corregido nombre de columna
         config.query(sql, [id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
 
-// Exportar todas las funciones definidas en este archivo
 export {
     listarTodosmarcasQuery,
     listarmarcasPorIdQuery,
     crearmarcasQuery,
     actualizarmarcasQuery,
     eliminarmarcasQuery   
-}
+};
