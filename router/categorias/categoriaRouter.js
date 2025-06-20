@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import {
-    listarTodoscategorias,
+    listartodoscategorias,
     listarcategoriasPorId,
     crearcategorias,
     actualizarcategorias,
@@ -12,7 +12,7 @@ const categoriasRouter = Router();
 
 
 
-categoriasRouter.get('/', listarTodoscategorias);
+categoriasRouter.get('/', listartodoscategorias);
 categoriasRouter.get('/:id', listarcategoriasPorId);
 
 categoriasRouter.post('/', crearcategorias);

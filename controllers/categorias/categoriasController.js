@@ -1,5 +1,5 @@
 import {
-    listarTodoscategoriasQuery,
+    listartodascategoriasQuery,
     listarcategoriasPorIdQuery,
     crearcategoriasQuery,
     actualizarcategoriasQuery,
@@ -8,13 +8,13 @@ import {
   /**
    * Obtener todos los categorias de la base de datos
    */
-  const listarTodoscategorias = async (req, res) => {
+  const listartodoscategorias = async (req, res) => {
     // Un bloque try-catch  sirve para validar si la peticion se obtiene o se devuelve un error
     // Try -> intentar
     // Catch -> capturar el error
     try {
       //  Ejecutar la consulta en la base de datos
-      const categorias = await listarTodoscategoriasQuery();
+      const categorias = await listartodascategoriasQuery();
       res.json(categorias);
     } catch (error) {
       res.status(500).send(error);
@@ -87,7 +87,7 @@ import {
   };
   
   export {
-    listarTodoscategorias,
+    listartodoscategorias,
     listarcategoriasPorId,
     crearcategorias,
     actualizarcategorias,

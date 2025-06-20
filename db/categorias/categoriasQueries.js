@@ -1,7 +1,5 @@
 import config from '../../config.js';
 
-
-// Helper function to handle query results
 const respuesta = (err, result, resolve, reject) => {
     if (err) {
         console.log(err);
@@ -10,13 +8,11 @@ const respuesta = (err, result, resolve, reject) => {
         resolve(result);
     }
 };
+
 /**
- * Carga la lista de categorias
+ * Carga la lista de categorías
  */
-const listarTodoscategoriasQuery = () => {
-    // Una promesa es una forma de que siempre se devuelva un resultado al quien llama (sea error o éxito)
-    // Si la consulta no genera error, entonces resuelve/cumple la promesa con el resultado
-    // Si hay algun error entonces rechaza la consulta e informa la razón 
+const listartodascategoriasQuery = () => {
     return new Promise((resolve, reject) => {
         config.query('SELECT * FROM categorias', (err, filas) => {
             respuesta(err, filas, resolve, reject);
@@ -25,7 +21,7 @@ const listarTodoscategoriasQuery = () => {
 };
 
 /**
- * Buscar un libro por su ID (llave primaria)
+ * Buscar una categoría por su ID
  */
 const listarcategoriasPorIdQuery = (id) => {
     return new Promise((resolve, reject) => {
@@ -35,50 +31,48 @@ const listarcategoriasPorIdQuery = (id) => {
     });
 };
 
-
 /**
- * Guardar un nuevo libro
+ * Guardar una nueva categoría
  */
-const crearcategoriasQuery = async (categorias) => {
-    const { id_categorias, nombre, descripcion, precio, stock, categoria_id, marca_id } = categorias;
+const crearcategoriasQuery = (categoria) => {
+    const { nombre } = categoria;
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO categorias (id_categoria, nombre) VALUES (?, ?)';
-        config.query(sql, [id_categorias, nombre], (err, resultado) => {
+        const sql = 'INSERT INTO categorias (nombre) VALUES (?)';
+        config.query(sql, [nombre], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
 
 /**
- * Actualizar un libro por su ID
+ * Actualizar una categoría por su ID
  */
-const actualizarcategoriasQuery = (id, categorias) => {
-    const { id_categorias, nombre} = categorias;
+const actualizarcategoriasQuery = (id, categoria) => {
+    const { nombre } = categoria;
     return new Promise((resolve, reject) => {
-        const sql = 'UPDATE categorias SET id_categorias = ?, nombre = ? WHERE id_categorias = ?';
-        config.query(sql, [id_categorias, nombre], (err, resultado) => {
+        const sql = 'UPDATE categorias SET nombre = ? WHERE id_categoria = ?';
+        config.query(sql, [nombre, id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
 
 /**
- * Eliminar un libro por su ID
+ * Eliminar una categoría por su ID
  */
 const eliminarcategoriasQuery = (id) => {
     return new Promise((resolve, reject) => {
-        const sql = 'DELETE FROM categorias WHERE id_categorias = ?';
+        const sql = 'DELETE FROM categorias WHERE id_categoria = ?';
         config.query(sql, [id], (err, resultado) => {
             respuesta(err, resultado, resolve, reject);
         });
     });
 };
 
-// Exportar todas las funciones definidas en este archivo
 export {
-    listarTodoscategoriasQuery,
+    listartodascategoriasQuery,
     listarcategoriasPorIdQuery,
     crearcategoriasQuery,
     actualizarcategoriasQuery,
     eliminarcategoriasQuery   
-}
+};
