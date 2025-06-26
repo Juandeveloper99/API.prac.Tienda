@@ -10,11 +10,9 @@ import productosrouter from './router/productos/productosRouter.js';
 import usuariosrouter from './router/usuarios/usuariosRouter.js';
 import clientesrouter from './router/clientes/clientesRouter.js';
 import marcasrouter from './router/marcas/marcasRouter.js';
-import proveedoresrouter from './router/proveedores/proveedoresRouter.js';
 import categoriasrouter from './router/categorias/categoriaRouter.js';
-import stonkrouter from './router/stonk/stonkRouter.js';
-import comprasrouter from './router/compras/comprasRouter.js';
 import facturacionrouter from './router/facturacion/facturacionRouter.js';
+import creditoRouter from './router/credito/creditoRouter.js';
 
 const app = express();
 
@@ -49,11 +47,9 @@ app.use('/productos', productosrouter);
 app.use('/usuarios', usuariosrouter);
 app.use('/clientes', clientesrouter);
 app.use('/marcas', marcasrouter);
-app.use('/proveedores', proveedoresrouter);
 app.use('/categorias', categoriasrouter);
-app.use('/movimientos_stock', stonkrouter);
-app.use('/compras', comprasrouter);
 app.use('/facturacion', facturacionrouter);
+app.use('/credito', creditoRouter);
 
 // 🔥 Levantar el servidor
 app.listen(port, () => {
